@@ -154,6 +154,81 @@ get_alter_backend_port() {
   read -p "> " alter_backend_port
 }
 
+get_dv_config() {
+  
+  print_banner
+  printf "${WHITE} 💻 Configuração Manual do Dispositivo Virtual (DV)${GRAY_LIGHT}"
+  printf "\n\n"
+  printf "${WHITE} Digite o nome da Instancia para configurar o DV:${GRAY_LIGHT}"
+  printf "\n\n"
+  read -p "> " dv_instancia
+  
+  print_banner
+  printf "${WHITE} 💻 Informe o número de telefone para o DV (com DDD, ex: 11999999999):${GRAY_LIGHT}"
+  printf "\n\n"
+  read -p "> " dv_phone
+  
+  print_banner
+  printf "${WHITE} 💻 Informe o nome exibido no WhatsApp (ex: Nome da Empresa):${GRAY_LIGHT}"
+  printf "\n\n"
+  read -p "> " dv_name
+  
+  print_banner
+  printf "${WHITE} 💻 Informe a descrição/Status do DV:${GRAY_LIGHT}"
+  printf "\n\n"
+  read -p "> " dv_description
+  
+  print_banner
+  printf "${WHITE} 💻 Deseja configurar mensagem de boas-vindas? (s/n):${GRAY_LIGHT}"
+  printf "\n\n"
+  read -p "> " dv_welcome_opt
+  
+  if [[ "$dv_welcome_opt" == "s" || "$dv_welcome_opt" == "S" ]]; then
+    print_banner
+    printf "${WHITE} 💻 Digite a mensagem de boas-vindas:${GRAY_LIGHT}"
+    printf "\n\n"
+    read -p "> " dv_welcome_msg
+  else
+    dv_welcome_msg=""
+  fi
+  
+  print_banner
+  printf "${WHITE} 💻 Deseja configurar mensagem de ausência? (s/n):${GRAY_LIGHT}"
+  printf "\n\n"
+  read -p "> " dv_away_opt
+  
+  if [[ "$dv_away_opt" == "s" || "$dv_away_opt" == "S" ]]; then
+    print_banner
+    printf "${WHITE} 💻 Digite a mensagem de ausência:${GRAY_LIGHT}"
+    printf "\n\n"
+    read -p "> " dv_away_msg
+  else
+    dv_away_msg=""
+  fi
+}
+
+configure_dv_manual() {
+  print_banner
+  printf "${WHITE} 💻 Aplicando configuração do DV para a instância ${dv_instancia}...${GRAY_LIGHT}"
+  printf "\n\n"
+  
+  sleep 2
+  
+  # Aplica configurações no banco de dados
+  dv_database_config
+  
+  # Atualiza arquivos de configuração
+  dv_update_files
+  
+  # Reinicia serviços
+  dv_restart_services
+  
+  # Mostra resumo
+  dv_show_summary
+  
+  sleep 3
+}
+
 
 get_urls() {
   get_mysql_root_password
@@ -198,6 +273,11 @@ software_dominio() {
   configurar_dominio
 }
 
+software_dv_config() {
+  get_dv_config
+  configure_dv_manual
+}
+
 inquiry_options() {
   
   print_banner
@@ -209,6 +289,7 @@ inquiry_options() {
   printf "   [3] Bloquear Whaticket\n"
   printf "   [4] Desbloquear Whaticket\n"
   printf "   [5] Alter. dominio Whaticket\n"
+  printf "   [6] Configurar DV Manual\n"
   printf "\n"
   read -p "> " option
 
@@ -234,6 +315,10 @@ inquiry_options() {
       ;;
     5) 
       software_dominio 
+      exit
+      ;;
+    6) 
+      software_dv_config 
       exit
       ;;        
 
